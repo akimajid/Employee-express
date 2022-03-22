@@ -49,6 +49,41 @@ app.get("/employee", (req, res) => {
     }
 })
 
+app.get("/employee/:employeeid", (req, res) => {
+  const employeeId = req.params.employeeid
+
+  const findIndex = employee.findIndex((val) => {
+    return val.id == employeeId
+  })
+
+  if (findIndex == -1) {
+    res.status(400).send(`employee with Id ${employeeId}, not found`)
+  }
+
+  res.status(200).json({
+    message: "employee found",
+    result: employee[findIndex]
+  })
+})
+
+app.post("/employee", (req, res) => {
+  const data = req.body
+
+  if (!data.full_name) {
+    res.status(400).json({
+      message: "employee data is required!"
+    })
+    return
+  }
+
+  employee.push(data)
+
+  res.status(201).json({
+    message: "Added employee",
+    result: data
+  })
+})
+
 app.delete("/employee/:employeeId", (req, res) => {
   const employeeId = req.params.employeeId
 
