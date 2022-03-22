@@ -5,6 +5,8 @@ const PORT = 2000
 
 app.use(express.json())
 
+const { nanoid } = require("nanoid")
+
 const employee = [
     {
         full_name: "Luna Stroman",
@@ -49,8 +51,8 @@ app.get("/employee", (req, res) => {
     }
 })
 
-app.get("/employee/:employeeid", (req, res) => {
-  const employeeId = req.params.employeeid
+app.get("/employee/:employeeId", (req, res) => {
+  const employeeId = req.params.employeeId
 
   const findIndex = employee.findIndex((val) => {
     return val.id == employeeId
@@ -69,18 +71,19 @@ app.get("/employee/:employeeid", (req, res) => {
 app.post("/employee", (req, res) => {
   const data = req.body
 
-  if (!data.full_name) {
-    res.status(400).json({
-      message: "employee data is required!"
-    })
+  if (!(data.full_name || data.gender || data.occupation)) {
+    res.status(400).send("All data must filled!")
+
     return
   }
 
-  employee.push(data)
+  const newEmployeeData = {...data, id: nanoid() }
+
+  employee.push(newEmployeeData)
 
   res.status(201).json({
     message: "Added employee",
-    result: data
+    result: newEmployeeData
   })
 })
 
@@ -102,6 +105,29 @@ app.delete("/employee/:employeeId", (req, res) => {
 
   res.status(200).json({
     message: "Employee deleted!"
+  })
+})
+
+app.patch("/employee/:employeeId", (req, res) => {
+  const editData = req.body
+  const employeeId = req.params.employeeId
+
+  const findIndex = employee.findIndex((val) => {
+    return val.id == employeeId
+  })
+  
+  if (findIndex == -1) {
+    res.status(400).send("Employee not found!")
+  }
+  
+  employee[findIndex] = {
+    ...employee[findIndex],
+    ...editData
+  }
+  
+  res.status(201).json({
+    message: `Employee with Id ${employeeId} has been edited`,
+    result: employee[findIndex]
   })
 })
 
