@@ -45,8 +45,29 @@ app.get("/employee", (req, res) => {
             result: employee
         })
     } else {
-      res.status(404).send("No users found!")
+      res.status(404).send("No employee found!")
     }
+})
+
+app.delete("/employee/:employeeId", (req, res) => {
+  const employeeId = req.params.employeeId
+
+  const findIndex = employee.findIndex((val) => {
+    return val.id == employeeId
+  })
+
+  if (findIndex == -1) {
+    res.status(400).json({
+      message: `employee with Id ${employeeId}, not found`
+    })
+    return
+  }
+
+  employee.splice(findIndex, 1)
+
+  res.status(200).json({
+    message: "Employee deleted!"
+  })
 })
 
 
